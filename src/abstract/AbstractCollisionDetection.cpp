@@ -27,6 +27,9 @@ void AbstractCollisionDetection::addDisabledCollisionPairs(srdf::Model::Collisio
 
 void AbstractCollisionDetection::removeDisabledCollisionLink(const std::string & link)
 {
+    // Fixes deprecated usage of global boost placeholders, i.e., '_1'.
+    using namespace boost::placeholders;
+
     remove_link_ = link;
     disabled_collisions_.erase(std::remove_if(disabled_collisions_.begin(), disabled_collisions_.end(), boost::bind(&AbstractCollisionDetection::isLinkListed, this, _1)), disabled_collisions_.end());
 
@@ -36,10 +39,5 @@ bool AbstractCollisionDetection::isLinkListed(srdf::Model::CollisionPair const &
 {
     return ((remove_link.link1_ == remove_link_) || (remove_link.link2_ == remove_link_) );
 }
-
-
-
-
-
 
 }

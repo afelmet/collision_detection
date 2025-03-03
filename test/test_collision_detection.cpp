@@ -1,4 +1,4 @@
-#include <base/samples/RigidBodyState.hpp>
+#include <base-types/samples/RigidBodyState.hpp>
 #include <collision_detection/CollisionFactory.hpp>
 
 using namespace collision_detection;
@@ -91,7 +91,8 @@ std::shared_ptr<octomap::OcTree> generateOctomap()
 {
     std::shared_ptr<octomap::OcTree> tree (new octomap::OcTree(0.5));
 
-    float logodds = -5.51106;
+    // Prevents unnecessary floating-point conversion.
+    float logodds = -5.51106f;
 
     octomap::OcTreeKey maxKey = tree->coordToKey(3.5, 3.5, 3.5);
     octomap::OcTreeKey minKey = tree->coordToKey(-3.5, -3.5, -3.5);
@@ -107,7 +108,9 @@ std::shared_ptr<octomap::OcTree> generateOctomap()
             }
         }
     }
-    logodds = 10.0;
+
+    // Prevents unnecessary floating-point conversion.
+    logodds = 10.0f;
     octomap::OcTreeKey obs_key = tree->coordToKey(0, 2.0, 0);
     tree->updateNode(obs_key, logodds);
     obs_key = tree->coordToKey(0, 2.20, 0);

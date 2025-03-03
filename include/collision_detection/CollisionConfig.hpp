@@ -74,8 +74,8 @@ enum CollisionInfoType
 
 struct CollisionLinkName
 {
-    CollisionLinkName(const std::string &link_1="", const std::string &link_2=""):
-    link_1(link_1), link_2(link_2){}
+    CollisionLinkName(const std::string &link_1_param="", const std::string &link_2_param=""):
+    link_1(link_1_param), link_2(link_2_param){}
     
     std::string link_1;
     std::string link_2;

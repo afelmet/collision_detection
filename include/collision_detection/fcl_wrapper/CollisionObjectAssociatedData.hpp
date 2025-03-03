@@ -14,7 +14,8 @@ private:
 public:
     CollisionObjectAssociatedData();
     std::string& getID();
-    void setID(const std::string &id);
+
+    void setID(const std::string &id_param);
 
 };
 

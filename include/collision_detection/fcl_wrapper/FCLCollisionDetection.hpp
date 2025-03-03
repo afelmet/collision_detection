@@ -63,7 +63,8 @@ class FCLCollisionDetection: public AbstractCollisionDetection
         
         virtual ~FCLCollisionDetection();
 
-        int numberOfObjectsInCollisionManger();
+        // The rest of the library expects a 'long unsigned int' instead of an 'int'.
+        long unsigned int numberOfObjectsInCollisionManger();
 
         void getCollisionManager(shared_ptr<fcl::BroadPhaseCollisionManager<double>> &collision_manager);
 
@@ -72,8 +73,8 @@ class FCLCollisionDetection: public AbstractCollisionDetection
 
         void registerOctreeToCollisionManager(const std::shared_ptr<octomap::OcTree> &octomap, const base::Pose &collision_object_pose, std::string link_name);
 
-        void registerOctreeAsBoxesToCollisionManager(const std::shared_ptr<octomap::OcTree> &octomap, const base::Pose &collision_object_pose, 
-                                                     std::string link_name);
+        // The parameter 'collision_object_pose' is never used in the function body.
+        void registerOctreeAsBoxesToCollisionManager(const std::shared_ptr<octomap::OcTree> &octomap, /* const base::Pose &collision_object_pose, */ std::string link_name);
 
         void registerBoxToCollisionManager(const double &box_x, const double &box_y, const double &box_z, const std::string &link_name ,
                                                  const base::Pose &collision_object_pose, const double &link_padding = 1.00 );

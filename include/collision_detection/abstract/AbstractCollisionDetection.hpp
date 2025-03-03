@@ -7,7 +7,9 @@
 #include <srdfdom/model.h>
 #include <octomap/octomap.h>
 
-#include <boost/bind.hpp>
+// Fixes deprecated usage of global boost placeholders.
+#include <boost/bind/bind.hpp>
+
 #include <base-logging/logging/Logging.hpp>
 
 
@@ -52,8 +54,8 @@ class AbstractCollisionDetection
         virtual void registerOctreeToCollisionManager(  const std::shared_ptr<octomap::OcTree> &octomap, const base::Pose &collision_object_pose, 
                                                         std::string link_name) = 0;
 
-        virtual void registerOctreeAsBoxesToCollisionManager(const std::shared_ptr<octomap::OcTree> &octomap, const base::Pose &collision_object_pose, 
-                                                             std::string link_name) = 0;
+        // The parameter 'collision_object_pose' is never used in the function body.
+        virtual void registerOctreeAsBoxesToCollisionManager(const std::shared_ptr<octomap::OcTree> &octomap, /* const base::Pose &collision_object_pose, */ std::string link_name) = 0;
 
         virtual bool registerMeshToCollisionManager(const std::string &abs_path_to_mesh_file, const Eigen::Vector3d &mesh_scale, const std::string &link_name, 
                                                     const base::Pose &collision_object_pose, const double &link_padding) = 0;
@@ -78,7 +80,8 @@ class AbstractCollisionDetection
 
         virtual bool removeObjectFromOctree(Eigen::Vector3d object_pose, Eigen::Vector3d object_size) = 0;
 
-        virtual int numberOfObjectsInCollisionManger() = 0;
+        // The rest of the library expects a 'long unsigned int' instead of an 'int'.
+        virtual long unsigned int numberOfObjectsInCollisionManger() = 0;
 
 //         virtual bool checkSelfCollision(int num_max_contacts=1) = 0;
 // 

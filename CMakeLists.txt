@@ -111,6 +111,9 @@ target_link_libraries(collision_detection
 set(TARGET_NAME ${PROJECT_NAME})
 set(PROJECT_DESCRIPTION "Collection of collision detection libraries")
 
+# Enable all warnings for space-qualification
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Werror -Wconversion -Wsign-conversion -Wshadow -Wfloat-equal -Wnull-dereference -Wformat -Wcast-align -Wpointer-arith")
+
 # Package configuration
 list(APPEND PKGCONFIG_REQUIRES kdl_parser urdfdom urdfdom_headers srdfdom octomap fcl base_types base_logging)
 list(JOIN PKGCONFIG_REQUIRES " " PKGCONFIG_REQUIRES_STR)
@@ -122,3 +125,14 @@ install(TARGETS ${PROJECT_NAME} DESTINATION lib)
 install(TARGETS abstract_collision_detection DESTINATION lib)
 install(TARGETS fcl_wrapper DESTINATION lib)
 install(FILES ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.pc DESTINATION lib/pkgconfig)
+
+add_executable(test_collision_detection test/test_collision_detection.cpp)
+
+target_include_directories(test_collision_detection PRIVATE ${MOTIONPLANNER_LIB_INCLUDES})
+
+target_link_libraries(test_collision_detection PRIVATE
+    ${TARGET_NAME}
+    ${MOTIONPLANNER_DEP_LIBS}
+)
+
+add_test(NAME CollisionDetectionTest COMMAND test_collision_detection)

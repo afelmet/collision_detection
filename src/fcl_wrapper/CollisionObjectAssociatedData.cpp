@@ -13,9 +13,9 @@ std::string& CollisionObjectAssociatedData::getID()
     return this->id;
 }
 
-void CollisionObjectAssociatedData::setID(const std::string &id)
+void CollisionObjectAssociatedData::setID(const std::string &id_param)
 {
-    this->id=id;
+    this->id=id_param;
 }
 
 }// end namespace trajectory_optimization
