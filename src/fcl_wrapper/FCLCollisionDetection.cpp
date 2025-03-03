@@ -211,9 +211,10 @@ bool completeDistanceFunction(fcl::CollisionObject<double>* o1, fcl::CollisionOb
             std::vector<fcl::Contact<double>> fcl_collision_contacts;
             next_result.getContacts(fcl_collision_contacts);
 
-            for(size_t i = 0; i<fcl_collision_contacts.size(); ++i)
+            // for(size_t i = 0; i<fcl_collision_contacts.size(); ++i)
+            for (const fcl::Contact<double> &cont : fcl_collision_contacts)
             {
-                const fcl::Contact<double> &cont = fcl_collision_contacts.at(i);
+                // const fcl::Contact<double> &cont = fcl_collision_contacts.at(i);
 
                 DistanceInformation contact_info;
                 contact_info.min_distance = -cont.penetration_depth;
@@ -223,7 +224,7 @@ bool completeDistanceFunction(fcl::CollisionObject<double>* o1, fcl::CollisionOb
 
                 contact_info.object1  = o1_collision_object_associated_data->getID();
                 contact_info.object2 = o2_collision_object_associated_data->getID();
-                 cdata->list_of_distance_information.push_back(contact_info);
+                cdata->list_of_distance_information.push_back(contact_info);
 
             }
 
@@ -246,8 +247,9 @@ FCLCollisionDetection::FCLCollisionDetection(CollisionDetectionConfig collision_
 
 FCLCollisionDetection::~FCLCollisionDetection()
 {
-    for(std::size_t i=0;i<collision_data_.size(); ++i)    
-        delete collision_data_.at(i);        
+    // for(std::size_t i=0;i<collision_data_.size(); ++i)
+    for (const CollisionObjectAssociatedData* &data : collision_data_)
+        delete data;
 }
 
 bool FCLCollisionDetection::extractTrianglesAndVerticesFromMesh(const std::string &abs_path_to_mesh_file, std::vector<fcl::Triangle> &triangles, 
@@ -275,21 +277,24 @@ bool FCLCollisionDetection::extractTrianglesAndVerticesFromMesh(const std::strin
     fcl::Vector3d vetex;
     fcl::Triangle triangle;
 
-    for(std::size_t i=0; i<scene->mNumMeshes; ++i )
+    // for(std::size_t i=0; i<scene->mNumMeshes; ++i )
+    for (const aiMesh &mesh : scene->mMeshes)
     {
-        for(std::size_t j=0;j<scene->mMeshes[i]->mNumFaces; ++j)
+        // for(std::size_t j=0;j<scene->mMeshes[i]->mNumFaces; ++j)
+        for (const aiFace &face : mesh->mFaces)
         {
-            triangle.set(scene->mMeshes[i]->mFaces[j].mIndices[0], scene->mMeshes[i]->mFaces[j].mIndices[1] , scene->mMeshes[i]->mFaces[j].mIndices[2]);
+            triangle.set(face.mIndices[0], face.mIndices[1] , face.mIndices[2]);
             triangles.push_back(triangle);
         }
 
-        for(std::size_t j=0;j<scene->mMeshes[i]->mNumVertices; ++j)
+        // for(std::size_t j=0;j<scene->mMeshes[i]->mNumVertices; ++j)
+        for (const aiVector3D &vertex : mesh->mVertices)
         {
             //vetex.setValue(scene->mMeshes[i]->mVertices[j].x* scale_for_mesha_files_x, scene->mMeshes[i]->mVertices[j].y*scale_for_mesha_files_y, 
 //scene->mMeshes[i]->mVertices[j].z*scale_for_mesha_files_z) ;
-            vetex.x() = scene->mMeshes[i]->mVertices[j].x* scale_for_mesha_files_x;
-            vetex.y() = scene->mMeshes[i]->mVertices[j].y*scale_for_mesha_files_y;
-            vetex.z() = scene->mMeshes[i]->mVertices[j].z*scale_for_mesha_files_z;
+            vetex.x() = vertex.x * scale_for_mesha_files_x;
+            vetex.y() = vertex.y * scale_for_mesha_files_y;
+            vetex.z() = vertex.z * scale_for_mesha_files_z;
 
             vertices.push_back(vetex);
         }
@@ -420,7 +425,7 @@ void FCLCollisionDetection::registerOctreeAsBoxesToCollisionManager(const std::s
     fcl_octomap_boxes_.reserve(octomap->size()/2);
 
     double octree_thres = octomap->getOccupancyThres();
-    for(auto it = octomap->begin(octomap->getTreeDepth()), end = octomap->end();it != end; ++it)
+    for(octomap::iterator it = octomap->begin(octomap->getTreeDepth()), end = octomap->end();it != end; ++it)
     {
         if(it->getOccupancy() >= octree_thres)
         {
@@ -612,10 +617,11 @@ bool FCLCollisionDetection::removeOctomapBoxes(const std::string &collision_obje
     }
  
     //unregister the collision object from collision manager.
-    for(std::size_t j = 0; j < fcl_octomap_boxes_.size(); ++j)
+    // for(std::size_t j = 0; j < fcl_octomap_boxes_.size(); ++j)
+    for (const fcl::CollisionObject<double> &box : fcl_octomap_boxes_)
     {
-        broad_phase_collision_manager->unregisterObject(fcl_octomap_boxes_[j]);
-        delete fcl_octomap_boxes_[j];
+        broad_phase_collision_manager->unregisterObject(box);
+        delete box;
     }
 
     //remove collision object from collision containter
@@ -768,7 +774,7 @@ bool FCLCollisionDetection::isCollisionsOccured( double &total_cost)
                 collision_object_names_ = self_collision_data.collision_info.collision_object_names;
                 if ( collision_detection_config_.stop_after_first_collision)
                     return true;
-                
+
                 total_cost = getCollisionCost(self_collision_data, full_collision_distance_information_); // store the distance information
 
                 // std::cout<<"Self Collision total Cost = "<< total_cost<<std::endl;
@@ -893,9 +899,11 @@ double FCLCollisionDetection::getCollisionCost(CollisionData &collision_data, st
     contacts.resize(fcl_collision_contacts.size());
     
     CollisionObjectAssociatedData * o1_collision_object_associated_data, * o2_collision_object_associated_data;
-    for(size_t i = 0; i<fcl_collision_contacts.size(); ++i)
+
+    // for(size_t i = 0; i<fcl_collision_contacts.size(); ++i)
+    for (const fcl::Contact<double> &cont : fcl_collision_contacts)
     {
-        const fcl::Contact<double> &cont = fcl_collision_contacts.at(i);
+        // const fcl::Contact<double> &cont = fcl_collision_contacts.at(i);
 
         DistanceInformation contact_info;
         contact_info.min_distance = cont.penetration_depth;
@@ -920,7 +928,12 @@ double FCLCollisionDetection::getCollisionCost(CollisionData &collision_data, st
             contact_info.object2 = "";
         }
 
-        contacts.at(i) = contact_info;
+        LOG_DEBUG_S << "SIZE OF CONTACTS: " << contacts.size();
+
+        // Would return an uncaught std::out_of_range exception, as the vector is being cleared before being passed to 'getCollisionCost' in 'isCollisionsOccured'.
+        // contacts.at(i) = contact_info;
+        contacts.push_back(contact_info);
+
         collision_cost +=  cont.penetration_depth;
     }
     return collision_cost;

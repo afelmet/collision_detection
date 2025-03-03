@@ -80,10 +80,11 @@ void printDistanceInformation(const collision_detection::AbstractCollisionPtr &c
     //cs.robot_model_->getRobotDistanceToCollisionInfo(distance_info);
     distance_info = collision_detector->getCollisionDistanceInformation();
 
-    for(size_t i=0; i<distance_info.size(); i++)
+    //for(size_t i=0; i<distance_info.size(); i++)
+    for (const DistanceInformation &info : distance_info)
     {
-        std::cout<<"Penetration depth between "<<distance_info.at(i).object1<<" and "<<distance_info.at(i).object2<<" is "<<distance_info.at(i).min_distance<<std::endl;
-        std::cout<<"contact_normal = \n"<< distance_info.at(i).contact_normal<<std::endl;
+        std::cout << "Penetration depth between " << info.object1 << " and " << info.object2 << " is " << info.min_distance << std::endl;
+        std::cout << "contact_normal = \n" << info.contact_normal << std::endl;
     }
 }
 
@@ -170,8 +171,10 @@ void checkForCollision(const collision_detection::AbstractCollisionPtr &robot_co
     {
         std::cout<<"Collision Occured between: \n";
         std::vector< std::pair<std::string, std::string> > collision_objects_name = robot_collision_detector->getCollidedObjectsNames();
-        for(size_t i = 0; i < collision_objects_name.size(); i++)
-            std::cout<<collision_objects_name.at(i).first<<"  "<<collision_objects_name.at(i).second<<std::endl;        
+
+        // for(size_t i = 0; i < collision_objects_name.size(); i++)
+        for (const std::pair<std::string, std::string> &name : collision_objects_name)
+            std::cout << name.first << "  " << name.second << std::endl;
     }
     else
         std::cout<<"There is no collision"<<std::endl;

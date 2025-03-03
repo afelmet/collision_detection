@@ -103,7 +103,7 @@ class AbstractCollisionDetection
                 return false;            
 
             //for(std::size_t i = 0; i < AbstractCollisionDetection::disabled_collisions_.size(); i++ )
-            for(auto &dc: AbstractCollisionDetection::disabled_collisions_)
+            for(const srdf::Model::CollisionPair &dc: AbstractCollisionDetection::disabled_collisions_)
             {
                 if( (first_link_name== dc.link1_ &&  second_link_name  == dc.link2_) || 
                     (second_link_name == dc.link1_ &&  first_link_name == dc.link2_)  )
