@@ -248,7 +248,7 @@ FCLCollisionDetection::FCLCollisionDetection(CollisionDetectionConfig collision_
 FCLCollisionDetection::~FCLCollisionDetection()
 {
     // for(std::size_t i=0;i<collision_data_.size(); ++i)
-    for (const CollisionObjectAssociatedData* &data : collision_data_)
+    for (CollisionObjectAssociatedData* data : collision_data_)
         delete data;
 }
 
@@ -274,29 +274,29 @@ bool FCLCollisionDetection::extractTrianglesAndVerticesFromMesh(const std::strin
     LOG_DEBUG_S<<"[extractTrianglesAndVerticesFromMesh]: Start extracting vertex and triangles from mesh file:" <<abs_path_to_mesh_file.c_str()
     <<".\nNumber of meshes found = "<<scene->mNumMeshes; 
 
-    fcl::Vector3d vetex;
+    fcl::Vector3d vertex;
     fcl::Triangle triangle;
 
-    // for(std::size_t i=0; i<scene->mNumMeshes; ++i )
-    for (const aiMesh &mesh : scene->mMeshes)
+    for(std::size_t i=0; i<scene->mNumMeshes; ++i)
+    // for (const aiMesh &mesh : scene->mMeshes)
     {
-        // for(std::size_t j=0;j<scene->mMeshes[i]->mNumFaces; ++j)
-        for (const aiFace &face : mesh->mFaces)
+        for(std::size_t j=0; j<scene->mMeshes[i]->mNumFaces; ++j)
+        // for (const aiFace &face : mesh->mFaces)
         {
-            triangle.set(face.mIndices[0], face.mIndices[1] , face.mIndices[2]);
+            triangle.set(scene->mMeshes[i]->mFaces[j].mIndices[0], scene->mMeshes[i]->mFaces[j].mIndices[1] , scene->mMeshes[i]->mFaces[j].mIndices[2]);
             triangles.push_back(triangle);
         }
 
-        // for(std::size_t j=0;j<scene->mMeshes[i]->mNumVertices; ++j)
-        for (const aiVector3D &vertex : mesh->mVertices)
+        for(std::size_t j=0;j<scene->mMeshes[i]->mNumVertices; ++j)
+        // for (const aiVector3D &vertex : mesh->mVertices)
         {
             //vetex.setValue(scene->mMeshes[i]->mVertices[j].x* scale_for_mesha_files_x, scene->mMeshes[i]->mVertices[j].y*scale_for_mesha_files_y, 
 //scene->mMeshes[i]->mVertices[j].z*scale_for_mesha_files_z) ;
-            vetex.x() = vertex.x * scale_for_mesha_files_x;
-            vetex.y() = vertex.y * scale_for_mesha_files_y;
-            vetex.z() = vertex.z * scale_for_mesha_files_z;
+            vertex.x() = scene->mMeshes[i]->mVertices[j].x * scale_for_mesha_files_x;
+            vertex.y() = scene->mMeshes[i]->mVertices[j].y * scale_for_mesha_files_y;
+            vertex.z() = scene->mMeshes[i]->mVertices[j].z * scale_for_mesha_files_z;
 
-            vertices.push_back(vetex);
+            vertices.push_back(vertex);
         }
     }
 //    delete scene;
@@ -425,7 +425,7 @@ void FCLCollisionDetection::registerOctreeAsBoxesToCollisionManager(const std::s
     fcl_octomap_boxes_.reserve(octomap->size()/2);
 
     double octree_thres = octomap->getOccupancyThres();
-    for(octomap::iterator it = octomap->begin(octomap->getTreeDepth()), end = octomap->end();it != end; ++it)
+    for(auto it = octomap->begin(octomap->getTreeDepth()), end = octomap->end();it != end; ++it)
     {
         if(it->getOccupancy() >= octree_thres)
         {
@@ -618,7 +618,7 @@ bool FCLCollisionDetection::removeOctomapBoxes(const std::string &collision_obje
  
     //unregister the collision object from collision manager.
     // for(std::size_t j = 0; j < fcl_octomap_boxes_.size(); ++j)
-    for (const fcl::CollisionObject<double> &box : fcl_octomap_boxes_)
+    for (fcl::CollisionObject<double> *box : fcl_octomap_boxes_)
     {
         broad_phase_collision_manager->unregisterObject(box);
         delete box;
