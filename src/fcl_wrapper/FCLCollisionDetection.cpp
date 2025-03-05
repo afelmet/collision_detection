@@ -387,12 +387,15 @@ void FCLCollisionDetection::registerOctreeToCollisionManager(const std::shared_p
     LOG_DEBUG_S<<"[FCLCollisionDetection]: Registering octomap of size = "<<octomap_ptr_->size();
 
     //1) register octomap tree to fcl
-    shared_ptr<fcl::OcTree<double>> fcl_OcTree_ptr(new fcl::OcTree<double>(  octomap_ptr_) );
+    shared_ptr<fcl::OcTree<double>> fcl_OcTree_ptr = std::make_shared<fcl::OcTree<double>>(octomap_ptr_);
     
     
-    CollisionObjectAssociatedData *collision_object_associated_data(new CollisionObjectAssociatedData );
-    collision_object_associated_data->setID(link_name);
-    fcl_OcTree_ptr->setUserData( collision_object_associated_data );
+    // NOTE: Causes memory leaks, as the associated data object is not stored in 'collision_data_' and thus not freed by its deconstructor.
+    //       Furthermore, the object is overwritten in 'registerCollisionObjectToCollisionManager' anyways.
+    //
+    // CollisionObjectAssociatedData *collision_object_associated_data(new CollisionObjectAssociatedData);
+    // collision_object_associated_data->setID(link_name);
+    // fcl_box_ptr->setUserData( collision_object_associated_data );
     
     
 //    shared_ptr< fcl::CollisionObject<double> > fcl_tree_collision_object_ptr (new fcl::CollisionObject<double>( fcl_OcTree_ptr, 
@@ -411,7 +414,7 @@ void FCLCollisionDetection::registerOctreeAsBoxesToCollisionManager(const std::s
     LOG_DEBUG_S<<"[FCLCollisionDetection]: Registering octomap of size = "<<octomap->size();
 
     //1) register octomap tree to fcl
-    shared_ptr<fcl::OcTree<double>> fcl_OcTree_ptr(new fcl::OcTree<double>(octomap->getResolution()));
+    shared_ptr<fcl::OcTree<double>> fcl_OcTree_ptr = std::make_shared<fcl::OcTree<double>>(octomap->getResolution());
     fcl_tree_collision_object_ptr_.reset(new fcl::CollisionObject<double>( fcl_OcTree_ptr));
     
     
@@ -484,14 +487,13 @@ void FCLCollisionDetection::registerMeshToCollisionManager(const std::string &li
                                                            const std::vector<fcl::Triangle> &triangles, const std::vector<fcl::Vector3d> &vertices)
 {
 
-    shared_ptr<fcl::BVHModel<fcl::OBBRSS<double> > >  fcl_mesh_ptr(new fcl::BVHModel<fcl::OBBRSS<double>>);
+    shared_ptr<fcl::BVHModel<fcl::OBBRSS<double>>> fcl_mesh_ptr = std::make_shared<fcl::BVHModel<fcl::OBBRSS<double>>>();
     fcl_mesh_ptr->beginModel();
     fcl_mesh_ptr->addSubModel(vertices,triangles);
     fcl_mesh_ptr->endModel();
     //fcl::Transform3d mesh_transform3f(collision_object_quaternion_orientation,collision_object_translation);
     //shared_ptr<fcl::CollisionObject<double>>   mesh_collision_object ( new fcl::CollisionObject<double>( fcl_mesh_ptr , mesh_transform3f )  );
-    shared_ptr<fcl::CollisionObject<double>> mesh_collision_object_ptr ( new fcl::CollisionObject<double>( fcl_mesh_ptr, 
-                                                                        collision_object_pose.orientation.toRotationMatrix(), collision_object_pose.position ) );
+    shared_ptr<fcl::CollisionObject<double>> mesh_collision_object_ptr = std::make_shared<fcl::CollisionObject<double>>(fcl_mesh_ptr, collision_object_pose.orientation.toRotationMatrix(), collision_object_pose.position);
 
     registerCollisionObjectToCollisionManager(link_name, mesh_collision_object_ptr); 
 
@@ -501,15 +503,16 @@ void FCLCollisionDetection::registerBoxToCollisionManager(const double &box_x, c
                                                           const base::Pose &collision_object_pose, const double &link_padding )
 
 {
-    shared_ptr<fcl::Box<double> > fcl_box_ptr(new fcl::Box<double>(box_x*link_padding, box_y*link_padding, box_z*link_padding));
+    shared_ptr<fcl::Box<double>> fcl_box_ptr = std::make_shared<fcl::Box<double>>(box_x*link_padding, box_y*link_padding, box_z*link_padding);
     
-    CollisionObjectAssociatedData *collision_object_associated_data(new CollisionObjectAssociatedData );
-    collision_object_associated_data->setID(link_name);
-    fcl_box_ptr->setUserData( collision_object_associated_data );
+    // NOTE: Causes memory leaks, as the associated data object is not stored in 'collision_data_' and thus not freed by its deconstructor.
+    //       Furthermore, the object is overwritten in 'registerCollisionObjectToCollisionManager' anyways.
+    //
+    // CollisionObjectAssociatedData *collision_object_associated_data(new CollisionObjectAssociatedData);
+    // collision_object_associated_data->setID(link_name);
+    // fcl_box_ptr->setUserData( collision_object_associated_data );
     
-    shared_ptr< fcl::CollisionObject<double>   > box_collision_object_ptr (new fcl::CollisionObject<double>( fcl_box_ptr, 
-                                                                            collision_object_pose.orientation.toRotationMatrix(), 
-                                                                            collision_object_pose.position ) ) ;
+    shared_ptr< fcl::CollisionObject<double>> box_collision_object_ptr = std::make_shared<fcl::CollisionObject<double>>(fcl_box_ptr, collision_object_pose.orientation.toRotationMatrix(), collision_object_pose.position);
 
     registerCollisionObjectToCollisionManager(link_name, box_collision_object_ptr);  
 
@@ -518,15 +521,16 @@ void FCLCollisionDetection::registerBoxToCollisionManager(const double &box_x, c
 void FCLCollisionDetection::registerCylinderToCollisionManager(const double &radius, const double &length, const std::string &link_name ,
                                                                const base::Pose &collision_object_pose, const double &link_padding )
 {
-    shared_ptr<fcl::Cylinder<double> > fcl_cylinder_ptr(new fcl::Cylinder<double>(radius*link_padding,length*link_padding));
+    shared_ptr<fcl::Cylinder<double>> fcl_cylinder_ptr = std::make_shared<fcl::Cylinder<double>>(radius*link_padding,length*link_padding);
     
-    CollisionObjectAssociatedData *collision_object_associated_data(new CollisionObjectAssociatedData );
-    collision_object_associated_data->setID(link_name);
-    fcl_cylinder_ptr->setUserData( collision_object_associated_data );
+     // NOTE: Causes memory leaks, as the associated data object is not stored in 'collision_data_' and thus not freed by its deconstructor.
+    //       Furthermore, the object is overwritten in 'registerCollisionObjectToCollisionManager' anyways.
+    //
+    // CollisionObjectAssociatedData *collision_object_associated_data(new CollisionObjectAssociatedData);
+    // collision_object_associated_data->setID(link_name);
+    // fcl_box_ptr->setUserData( collision_object_associated_data );
 
-    shared_ptr< fcl::CollisionObject<double>   > cylinder_collision_object_ptr (new fcl::CollisionObject<double>( fcl_cylinder_ptr, 
-                                                                                  collision_object_pose.orientation.toRotationMatrix(), 
-                                                                                  collision_object_pose.position ) ) ;
+    shared_ptr< fcl::CollisionObject<double>> cylinder_collision_object_ptr = std::make_shared<fcl::CollisionObject<double>>(fcl_cylinder_ptr, collision_object_pose.orientation.toRotationMatrix(), collision_object_pose.position);
 
     registerCollisionObjectToCollisionManager(link_name, cylinder_collision_object_ptr);  
 
@@ -534,15 +538,16 @@ void FCLCollisionDetection::registerCylinderToCollisionManager(const double &rad
 
 void FCLCollisionDetection::registerSphereToCollisionManager(const double &radius, const std::string &link_name , const base::Pose &collision_object_pose, const double &link_padding )
 {
-    shared_ptr<fcl::Sphere<double> > fcl_sphere_ptr(new fcl::Sphere<double> (radius*link_padding));
+    shared_ptr<fcl::Sphere<double>> fcl_sphere_ptr = std::make_shared<fcl::Sphere<double>>(radius*link_padding);
     
-    CollisionObjectAssociatedData *collision_object_associated_data(new CollisionObjectAssociatedData );
-    collision_object_associated_data->setID(link_name);
-    fcl_sphere_ptr->setUserData( collision_object_associated_data );
+     // NOTE: Causes memory leaks, as the associated data object is not stored in 'collision_data_' and thus not freed by its deconstructor.
+    //       Furthermore, the object is overwritten in 'registerCollisionObjectToCollisionManager' anyways.
+    //
+    // CollisionObjectAssociatedData *collision_object_associated_data(new CollisionObjectAssociatedData);
+    // collision_object_associated_data->setID(link_name);
+    // fcl_box_ptr->setUserData( collision_object_associated_data );
 
-    shared_ptr< fcl::CollisionObject<double>   > sphere_collision_object_ptr (new fcl::CollisionObject<double>( fcl_sphere_ptr, 
-                                                                                collision_object_pose.orientation.toRotationMatrix(), 
-                                                                                collision_object_pose.position  ) ) ;
+    shared_ptr<fcl::CollisionObject<double>> sphere_collision_object_ptr = std::make_shared<fcl::CollisionObject<double>>(fcl_sphere_ptr, collision_object_pose.orientation.toRotationMatrix(), collision_object_pose.position);
 
     registerCollisionObjectToCollisionManager(link_name, sphere_collision_object_ptr);
 }
