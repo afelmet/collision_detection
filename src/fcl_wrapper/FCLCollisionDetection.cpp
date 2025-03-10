@@ -55,7 +55,7 @@ std::string remove_collision_object_4m_collisionManager;
 
     if(AbstractCollisionDetection::linksToBeChecked(first_object_name, second_object_name ))
     {
-        fcl::collide(o1, o2, request, result);
+        (void) fcl::collide(o1, o2, request, result);
 
         if( result.isCollision() )
         {
@@ -118,7 +118,7 @@ std::string remove_collision_object_4m_collisionManager;
         // So one need to set high value for min_distance
         // See FCL issue #403: https://github.com/flexible-collision-library/fcl/issues/403
         result.min_distance = std::numeric_limits<double>::max(); 
-        fcl::distance(o1, o2, request, result);
+        (void) fcl::distance(o1, o2, request, result);
 
         if(result.min_distance > 0)
         {
@@ -199,7 +199,7 @@ std::string remove_collision_object_4m_collisionManager;
         // So one need to set high value for min_distance
         // See FCL issue #403: https://github.com/flexible-collision-library/fcl/issues/403
         result.min_distance = std::numeric_limits<double>::max(); 
-        fcl::distance(o1, o2, request, result);
+        (void) fcl::distance(o1, o2, request, result);
 
 
         if(result.min_distance > 0)
@@ -235,7 +235,7 @@ std::string remove_collision_object_4m_collisionManager;
             fcl::CollisionRequest<double> next_request(100, true,1, true, true, fcl::GJKSolverType::GST_LIBCCD, 1e-3);
             fcl::CollisionResult<double> next_result;
 
-            fcl::collide(o1, o2, next_request, next_result);
+            (void) fcl::collide(o1, o2, next_request, next_result);
             std::vector<fcl::Contact<double>> fcl_collision_contacts;
             next_result.getContacts(fcl_collision_contacts);
 
@@ -355,7 +355,9 @@ void FCLCollisionDetection::updateEnvironment(const std::shared_ptr<octomap::OcT
     // Simply copying the octomap is not updating the fcl based octree, so if new environment is updated, fcl fails to find collision.
     // So a temporary solution is to remove the old environment and then re-register the new environment. This quick fix is not an elegant solution,
     // a proper solution to this problem should be found to handle continuous input octomap.
-    removeWorldCollisionObject(env_object_name);
+    if (!removeWorldCollisionObject(env_object_name)) {
+        LOG_ERROR_S << "Tried to remove world object, not existing in the collision manager.";
+    }
 
     base::Pose collision_object_pose;
     collision_object_pose.position.setZero();
@@ -368,7 +370,9 @@ void FCLCollisionDetection::updateEnvironment(const std::shared_ptr<octomap::OcT
 void FCLCollisionDetection::updateOctomapBoxesEnvironment(const std::shared_ptr<octomap::OcTree> &octomap, const std::string &env_object_name)
 {
 
-    removeOctomapBoxes(env_object_name);
+    if (!removeOctomapBoxes(env_object_name)) {
+        LOG_ERROR_S << "Tried to remove octomap box of object, not existing in the collision manager.";
+    }
     
     // base::Pose collision_object_pose;
     // collision_object_pose.position.setZero();
@@ -395,7 +399,7 @@ void FCLCollisionDetection::updateOctomapBoxesEnvironment(const std::shared_ptr<
                 {
                     // known cell
                     if (octomap_ptr_->search(ix,iy,iz))
-                        octomap_ptr_->setNodeValue(ix,iy,iz, -1.0, false);
+                        (void) octomap_ptr_->setNodeValue(ix,iy,iz, -1.0, false);
                 }
             }
         }
@@ -718,12 +722,12 @@ void FCLCollisionDetection::calculateCompleteDistanceInfo()
 
     // First check self collision
     DistanceData self_collision_data = getDistanceData();
-    broad_phase_collision_manager->distance(&self_collision_data, completeDistanceFunction);
+    (void) broad_phase_collision_manager->distance(&self_collision_data, completeDistanceFunction);
     full_collision_distance_information_ = self_collision_data.list_of_distance_information; // store the distance information
 
     // Now we do collision check withe environment
     DistanceData env_collision_data;
-    broad_phase_collision_manager->distance( world_collision_detector_->getCollisionManager().get(), &env_collision_data, completeDistanceFunction);
+    (void) broad_phase_collision_manager->distance( world_collision_detector_->getCollisionManager().get(), &env_collision_data, completeDistanceFunction);
 
     // store the distance information
     full_collision_distance_information_.insert(full_collision_distance_information_.end(), env_collision_data.list_of_distance_information.begin(),
@@ -738,7 +742,7 @@ void FCLCollisionDetection::calculateOnlyEnvironmentDistanceInfo()
 
     // Collision check with the environment
     DistanceData env_collision_data = getDistanceData();
-    broad_phase_collision_manager->distance( world_collision_detector_->getCollisionManager().get(), &env_collision_data, completeDistanceFunction);
+    (void) broad_phase_collision_manager->distance( world_collision_detector_->getCollisionManager().get(), &env_collision_data, completeDistanceFunction);
     full_collision_distance_information_ = env_collision_data.list_of_distance_information; // store the distance information
 }
 
@@ -756,7 +760,7 @@ void FCLCollisionDetection::calculateOnlyEnvironmentDistanceInfo()
         case collision_detection::DISTANCE:
         {
             DistanceData self_collision_data = getDistanceData();
-            broad_phase_collision_manager->distance(&self_collision_data, defaultDistanceFunction); 
+            (void) broad_phase_collision_manager->distance(&self_collision_data, defaultDistanceFunction);
             if (self_collision_data.collision_info.number_of_collisions > 0)
             {
                 total_cost = self_collision_data.collision_info.collision_cost;
@@ -773,7 +777,7 @@ void FCLCollisionDetection::calculateOnlyEnvironmentDistanceInfo()
 
             // Now we do collision check withe environment
             DistanceData env_collision_data = getDistanceData();
-            broad_phase_collision_manager->distance(  world_collision_detector_->getCollisionManager().get(), &env_collision_data, defaultDistanceFunction);
+            (void) broad_phase_collision_manager->distance(  world_collision_detector_->getCollisionManager().get(), &env_collision_data, defaultDistanceFunction);
             if (env_collision_data.collision_info.number_of_collisions > 0)
             {
                 collision_object_names_.insert(collision_object_names_.end(), env_collision_data.collision_info.collision_object_names.begin(),
@@ -800,7 +804,7 @@ void FCLCollisionDetection::calculateOnlyEnvironmentDistanceInfo()
         case collision_detection::MULTI_CONTACT:
         {
             CollisionData self_collision_data = getCollisionData();
-            broad_phase_collision_manager->collide(&self_collision_data, defaultCollisionFunction);
+            (void) broad_phase_collision_manager->collide(&self_collision_data, defaultCollisionFunction);
             if (self_collision_data.collision_info.number_of_collisions > 0)
             {
 
@@ -817,7 +821,7 @@ void FCLCollisionDetection::calculateOnlyEnvironmentDistanceInfo()
                 LOG_DEBUG("[FCLCollisionDetection]: There is no self collisions, now we are checking for collisions against environment");
             // Now we do collision check withe environment
             CollisionData env_collision_data = getCollisionData();
-            broad_phase_collision_manager->collide(  world_collision_detector_->getCollisionManager().get(), &env_collision_data, defaultCollisionFunction);
+            (void) broad_phase_collision_manager->collide(  world_collision_detector_->getCollisionManager().get(), &env_collision_data, defaultCollisionFunction);
             if (env_collision_data.collision_info.number_of_collisions > 0)
             {
                 collision_object_names_.insert(collision_object_names_.end(), env_collision_data.collision_info.collision_object_names.begin(),
@@ -854,7 +858,7 @@ void FCLCollisionDetection::calculateOnlyEnvironmentDistanceInfo()
 /**/
 [[nodiscard]] bool FCLCollisionDetection::distanceOfClosestObstacleToRobot(shared_ptr<fcl::BroadPhaseCollisionManager<double>> &external_broad_phase_collision_manager,DistanceData &distance_data)
 {
-    this->broad_phase_collision_manager->distance( external_broad_phase_collision_manager.get(), &distance_data, defaultDistanceFunction);
+    (void) this->broad_phase_collision_manager->distance( external_broad_phase_collision_manager.get(), &distance_data, defaultDistanceFunction);
 
     // Preventing divide-by-zero errors with safe floating-point comparison, e.g., abs(v) < e is equivalent to v == 0.0 for small e.
     if(std::abs(distance_data.result.min_distance) < 1e-10)
