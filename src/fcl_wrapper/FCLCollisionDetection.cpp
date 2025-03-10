@@ -1,5 +1,6 @@
 #include "collision_detection/fcl_wrapper/FCLCollisionDetection.hpp"
 #include <algorithm>
+#include <stdexcept>
 
 namespace collision_detection
 {
@@ -7,18 +8,33 @@ namespace collision_detection
 // std::vector< DistanceInformation> list_of_distance_information;
 std::string remove_collision_object_4m_collisionManager;
 
-bool isObjectListedInCollisionObjectAssociatedData(CollisionObjectAssociatedData *remove_object)
+[[nodiscard]] bool isObjectListedInCollisionObjectAssociatedData(CollisionObjectAssociatedData *remove_object)
 {
+    if (remove_object == nullptr) {
+        LOG_FATAL_S << "[isObjectListedInCollisionObjectAssociatedData] Received 'nullptr' in parameters; unable to continue.";
+
+        // TODO: Handle more gracefully.
+        throw std::invalid_argument("Received 'nullptr' in parameters; unable to continue.");;
+    }
+
     return ( remove_object->getID() == remove_collision_object_4m_collisionManager);
 }
 
-bool defaultCollisionFunction(fcl::CollisionObject<double>* o1, fcl::CollisionObject<double>* o2, void* cdata_)
+[[nodiscard]] bool defaultCollisionFunction(fcl::CollisionObject<double>* o1, fcl::CollisionObject<double>* o2, void* cdata_)
 {
+    if (o1 == nullptr || o2 == nullptr || cdata_ == nullptr) {
+        LOG_FATAL_S << "[defaultCollisionFunction] Received 'nullptr' in parameters; unable to continue.";
+
+        // TODO: Handle more gracefully.
+        throw std::invalid_argument("Received 'nullptr' in parameters; unable to continue.");;
+    }
+
     CollisionData* cdata                            = static_cast<CollisionData*>(cdata_);
     const fcl::CollisionRequest<double>& request    = cdata->request;
     fcl::CollisionResult<double>& result            = cdata->result;
 
     //why we do this ?
+    // GUESS: Stops evaluating other links after the first detected collision, if configured this way.
     if(cdata->done)
     {
         // ??
@@ -66,8 +82,14 @@ bool defaultCollisionFunction(fcl::CollisionObject<double>* o1, fcl::CollisionOb
     return cdata->done;
 }
 
-bool defaultDistanceFunction(fcl::CollisionObject<double>* o1, fcl::CollisionObject<double>* o2, void* cdata_, double& dist)
+[[nodiscard]] bool defaultDistanceFunction(fcl::CollisionObject<double>* o1, fcl::CollisionObject<double>* o2, void* cdata_, double& dist)
 {
+    if (o1 == nullptr || o2 == nullptr || cdata_ == nullptr) {
+        LOG_FATAL_S << "[defaultCollisionFunction] Received 'nullptr' in parameters; unable to continue.";
+
+        // TODO: Handle more gracefully.
+        throw std::invalid_argument("Received 'nullptr' in parameters; unable to continue.");;
+    }
 
     DistanceData* cdata                         = static_cast<DistanceData*>(cdata_);
     const fcl::DistanceRequest<double>& request = cdata->request;
@@ -141,9 +163,15 @@ bool defaultDistanceFunction(fcl::CollisionObject<double>* o1, fcl::CollisionObj
     return cdata->done;
 }
 
-bool completeDistanceFunction(fcl::CollisionObject<double>* o1, fcl::CollisionObject<double>* o2, void* cdata_, double& dist)
+[[nodiscard]] bool completeDistanceFunction(fcl::CollisionObject<double>* o1, fcl::CollisionObject<double>* o2, void* cdata_, double& dist)
 {
-    
+    if (o1 == nullptr || o2 == nullptr || cdata_ == nullptr) {
+        LOG_FATAL_S << "[defaultCollisionFunction] Received 'nullptr' in parameters; unable to continue.";
+
+        // TODO: Handle more gracefully.
+        throw std::invalid_argument("Received 'nullptr' in parameters; unable to continue.");;
+    }
+
     DistanceData* cdata                         = static_cast<DistanceData*>(cdata_);
     const fcl::DistanceRequest<double>& request = cdata->request;
     fcl::DistanceResult<double>& result         = cdata->result;
@@ -252,7 +280,7 @@ FCLCollisionDetection::~FCLCollisionDetection()
         delete data;
 }
 
-bool FCLCollisionDetection::extractTrianglesAndVerticesFromMesh(const std::string &abs_path_to_mesh_file, std::vector<fcl::Triangle> &triangles, 
+[[nodiscard]] bool FCLCollisionDetection::extractTrianglesAndVerticesFromMesh(const std::string &abs_path_to_mesh_file, std::vector<fcl::Triangle> &triangles,
                                                                 std::vector<fcl::Vector3d>& vertices, double scale_for_mesha_files_x=1.00, 
                                                                 double scale_for_mesha_files_y=1.00, double scale_for_mesha_files_z=1.00 )
 {
@@ -350,7 +378,7 @@ void FCLCollisionDetection::updateOctomapBoxesEnvironment(const std::shared_ptr<
 }
 
 
-bool FCLCollisionDetection::removeObjectFromOctree(Eigen::Vector3d object_pose, Eigen::Vector3d object_size)
+[[nodiscard]] bool FCLCollisionDetection::removeObjectFromOctree(Eigen::Vector3d object_pose, Eigen::Vector3d object_size)
 {
     if(octomap_ptr_)
     {
@@ -458,7 +486,7 @@ void FCLCollisionDetection::registerOctreeAsBoxesToCollisionManager(const std::s
 }
 
 
-bool FCLCollisionDetection::registerMeshToCollisionManager( const std::string &abs_path_to_mesh_file, const Eigen::Vector3d &mesh_scale, 
+[[nodiscard]] bool FCLCollisionDetection::registerMeshToCollisionManager( const std::string &abs_path_to_mesh_file, const Eigen::Vector3d &mesh_scale,
                                                             const std::string &link_name, const base::Pose &collision_object_pose, const double &link_padding)
 {
     LOG_DEBUG_S<<"[FCLCollisionDetection]: Registering mesh file: "<<abs_path_to_mesh_file.c_str();
@@ -567,7 +595,7 @@ void FCLCollisionDetection::registerCollisionObjectToCollisionManager(const std:
     collision_objects_container_.insert(link_name_CollisionObject );
 }
 
-bool FCLCollisionDetection::removeSelfCollisionObject(const std::string &collision_object_name)
+[[nodiscard]] bool FCLCollisionDetection::removeSelfCollisionObject(const std::string &collision_object_name)
 {
     //find the collision object -
     CollisionObjectsMap::iterator it=collision_objects_container_.find(collision_object_name);
@@ -588,7 +616,7 @@ bool FCLCollisionDetection::removeSelfCollisionObject(const std::string &collisi
     return true;
 }
 
-bool FCLCollisionDetection::removeWorldCollisionObject(const std::string &collision_object_name)
+[[nodiscard]] bool FCLCollisionDetection::removeWorldCollisionObject(const std::string &collision_object_name)
 {
     //find the collision object -
     CollisionObjectsMap::iterator it = collision_objects_container_.find(collision_object_name);
@@ -609,7 +637,7 @@ bool FCLCollisionDetection::removeWorldCollisionObject(const std::string &collis
     return true;
 }
 
-bool FCLCollisionDetection::removeOctomapBoxes(const std::string &collision_object_name)
+[[nodiscard]] bool FCLCollisionDetection::removeOctomapBoxes(const std::string &collision_object_name)
 {
     //find the collision object -
     CollisionObjectsMap::iterator it = collision_objects_container_.find(collision_object_name);
@@ -666,7 +694,7 @@ void FCLCollisionDetection::updateCollisionObjectTransform(std::string link_name
 
 
 // We are going to downcast the abstract collision object
-bool FCLCollisionDetection::assignWorldDetector(AbstractCollisionPtr collision_detector)
+[[nodiscard]] bool FCLCollisionDetection::assignWorldDetector(AbstractCollisionPtr collision_detector)
 {
     try
     {
@@ -715,7 +743,7 @@ void FCLCollisionDetection::calculateOnlyEnvironmentDistanceInfo()
 }
 
 
-bool FCLCollisionDetection::isCollisionsOccured( double &total_cost)
+[[nodiscard]] bool FCLCollisionDetection::isCollisionsOccured( double &total_cost)
 {
     total_cost = 0.0;
     collision_object_names_.clear();
@@ -824,7 +852,7 @@ bool FCLCollisionDetection::isCollisionsOccured( double &total_cost)
 
 
 /**/
-bool FCLCollisionDetection::distanceOfClosestObstacleToRobot(shared_ptr<fcl::BroadPhaseCollisionManager<double>> &external_broad_phase_collision_manager,DistanceData &distance_data)
+[[nodiscard]] bool FCLCollisionDetection::distanceOfClosestObstacleToRobot(shared_ptr<fcl::BroadPhaseCollisionManager<double>> &external_broad_phase_collision_manager,DistanceData &distance_data)
 {
     this->broad_phase_collision_manager->distance( external_broad_phase_collision_manager.get(), &distance_data, defaultDistanceFunction);
 
@@ -842,13 +870,13 @@ void FCLCollisionDetection::getCollisionManager(shared_ptr<fcl::BroadPhaseCollis
 }
 
 
-shared_ptr<fcl::BroadPhaseCollisionManager<double>> & FCLCollisionDetection::getCollisionManager()
+[[nodiscard]] shared_ptr<fcl::BroadPhaseCollisionManager<double>> & FCLCollisionDetection::getCollisionManager()
 {
     return this->broad_phase_collision_manager;
 }
 
 // The rest of the library expects a 'long unsigned int' instead of an 'int'.
-long unsigned int FCLCollisionDetection::numberOfObjectsInCollisionManger()
+[[nodiscard]] long unsigned int FCLCollisionDetection::numberOfObjectsInCollisionManger()
 {
     std::vector<fcl::CollisionObject<double>*> objs;
     broad_phase_collision_manager->getObjects(objs);
@@ -856,7 +884,7 @@ long unsigned int FCLCollisionDetection::numberOfObjectsInCollisionManger()
 }
 
 
-DistanceData FCLCollisionDetection::getDistanceData()
+[[nodiscard]] DistanceData FCLCollisionDetection::getDistanceData()
 {
     DistanceData distance_data;
     
@@ -878,7 +906,7 @@ DistanceData FCLCollisionDetection::getDistanceData()
     return distance_data;
 }
 
-CollisionData FCLCollisionDetection::getCollisionData()
+[[nodiscard]] CollisionData FCLCollisionDetection::getCollisionData()
 {
     CollisionData collision_data;
     
@@ -895,7 +923,7 @@ CollisionData FCLCollisionDetection::getCollisionData()
     return collision_data;
 }
 
-double FCLCollisionDetection::getCollisionCost(CollisionData &collision_data, std::vector<DistanceInformation> &contacts)
+[[nodiscard]] double FCLCollisionDetection::getCollisionCost(CollisionData &collision_data, std::vector<DistanceInformation> &contacts)
 {
     double collision_cost = 0.0;
     std::vector<fcl::Contact<double>> fcl_collision_contacts;
@@ -944,18 +972,18 @@ double FCLCollisionDetection::getCollisionCost(CollisionData &collision_data, st
     return collision_cost;
 }
 
-std::vector< DistanceInformation>& FCLCollisionDetection::getCollisionDistanceInformation()
+[[nodiscard]] std::vector< DistanceInformation>& FCLCollisionDetection::getCollisionDistanceInformation()
 {
     return full_collision_distance_information_;
 }
 
-std::vector< DistanceInformation>& FCLCollisionDetection::getCompleteDistanceInformation()
+[[nodiscard]] std::vector< DistanceInformation>& FCLCollisionDetection::getCompleteDistanceInformation()
 {
     calculateCompleteDistanceInfo();
     return full_collision_distance_information_;
 }
 
-std::vector< DistanceInformation>& FCLCollisionDetection::getOnlyEnvironmentDistanceInformation()
+[[nodiscard]] std::vector< DistanceInformation>& FCLCollisionDetection::getOnlyEnvironmentDistanceInformation()
 {
     calculateOnlyEnvironmentDistanceInfo();
     return full_collision_distance_information_;
@@ -972,7 +1000,7 @@ void FCLCollisionDetection::printCollisionObject()
     //std::cout<<"---- End of print collision object funtion ------ "<<std::endl;
 }
 
-std::vector<std::string> FCLCollisionDetection::getRobotCollisionObjectsNames()
+[[nodiscard]] std::vector<std::string> FCLCollisionDetection::getRobotCollisionObjectsNames()
 {
     std::vector<std::string> collision_object_names;
 
@@ -982,7 +1010,7 @@ std::vector<std::string> FCLCollisionDetection::getRobotCollisionObjectsNames()
     return collision_object_names;
 }
 
-std::vector<std::string> FCLCollisionDetection::getWorldCollisionObjectsNames()
+[[nodiscard]] std::vector<std::string> FCLCollisionDetection::getWorldCollisionObjectsNames()
 {
     std::vector<std::string> collision_object_names;
 
@@ -994,7 +1022,7 @@ std::vector<std::string> FCLCollisionDetection::getWorldCollisionObjectsNames()
         
         
 
-std::vector< std::pair<std::string, std::string> > FCLCollisionDetection::getCollidedObjectsNames()
+[[nodiscard]] std::vector< std::pair<std::string, std::string> > FCLCollisionDetection::getCollidedObjectsNames()
 {
    return collision_object_names_;
 }
@@ -1010,5 +1038,3 @@ void FCLCollisionDetection::saveOctree()
 }
 
 }// end namespace collision_detection
-
-

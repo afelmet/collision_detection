@@ -8,7 +8,7 @@ CollisionObjectAssociatedData::CollisionObjectAssociatedData()
 }
 
 
-std::string& CollisionObjectAssociatedData::getID()
+[[nodiscard]] std::string& CollisionObjectAssociatedData::getID()
 {
     return this->id;
 }

@@ -35,7 +35,7 @@ void AbstractCollisionDetection::removeDisabledCollisionLink(const std::string &
 
 }
 
-bool AbstractCollisionDetection::isLinkListed(srdf::Model::CollisionPair const &remove_link)
+[[nodiscard]] bool AbstractCollisionDetection::isLinkListed(srdf::Model::CollisionPair const &remove_link)
 {
     return ((remove_link.link1_ == remove_link_) || (remove_link.link2_ == remove_link_) );
 }

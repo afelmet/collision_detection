@@ -11,8 +11,7 @@ CollisionFactory::~CollisionFactory()
 
 
 // AbstractCollisionPtr CollisionFactory::getCollisionDetector(collision_detection::CollisionLibrary library, OctreeDebugConfig octree_debug_config, bool use_contact_info)
-AbstractCollisionPtr CollisionFactory::getCollisionDetector(CollisionDetectionConfig collision_detection_config)
-
+[[nodiscard]] AbstractCollisionPtr CollisionFactory::getCollisionDetector(CollisionDetectionConfig collision_detection_config)
 {
 	AbstractCollisionPtr collision_detector = NULL;
 	    
@@ -33,6 +32,5 @@ AbstractCollisionPtr CollisionFactory::getCollisionDetector(CollisionDetectionCo
 	}
 	return collision_detector;
 }
-   
 
 }

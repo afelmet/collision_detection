@@ -115,7 +115,7 @@ set(TARGET_NAME ${PROJECT_NAME})
 set(PROJECT_DESCRIPTION "Collection of collision detection libraries")
 
 # Enable all warnings for space-qualification
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Werror -Wconversion -Wsign-conversion -Wshadow -Wfloat-equal -Wnull-dereference -Wformat -Wcast-align -Wpointer-arith")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Werror -Wconversion -Wsign-conversion -Wshadow -Wfloat-equal -Wnull-dereference -Wformat -Wcast-align -Wpointer-arith -Wunused-result")
 
 # Package configuration
 list(APPEND PKGCONFIG_REQUIRES kdl_parser urdfdom urdfdom_headers srdfdom octomap fcl base_types base_logging)
