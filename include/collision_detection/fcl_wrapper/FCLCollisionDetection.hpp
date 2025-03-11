@@ -13,17 +13,22 @@
 #include <sys/stat.h> //needed to create director (mkdir function)
 
 #include <fcl/config.h>
-#if (FCL_MAJOR_VERSION > 0 || (FCL_MAJOR_VERSION >= 0 && \
-     (FCL_MINOR_VERSION > 4 || (FCL_MINOR_VERSION >= 4 && \
-      FCL_PATCH_VERSION > 0))))
+/* NOTE: Since the version of FCL can be expected to always be > 0.4.0 for EU-Rise, adding optional
+ *       support for boost through the preprocessor only adds complexity for testing.
+ *
+ * #if (FCL_MAJOR_VERSION > 0 || (FCL_MAJOR_VERSION >= 0 && \
+ *      (FCL_MINOR_VERSION > 4 || (FCL_MINOR_VERSION >= 4 && \
+ *       FCL_PATCH_VERSION > 0))))
+ */
 #include <memory>
 #include <functional>
-#else
-#define USE_BOOST_SHARED_PTR
-#include <boost/shared_ptr.hpp>
-#include <boost/function.hpp>
-#include <boost/make_shared.hpp>
-#endif
+/* #else
+ * #define USE_BOOST_SHARED_PTR
+ * #include <boost/shared_ptr.hpp>
+ * #include <boost/function.hpp>
+ * #include <boost/make_shared.hpp>
+ * #endif
+ */
 
 #include <fcl/fcl.h>
 
@@ -34,20 +39,24 @@
 namespace collision_detection
 {
 
-#ifdef USE_BOOST_SHARED_PTR
-    using ::boost::shared_ptr;
-    using ::boost::make_shared;
-    using ::boost::dynamic_pointer_cast;
-    using ::boost::static_pointer_cast;
-    using ::boost::function1;
-#else
-    using ::std::shared_ptr;
-    using ::std::make_shared;
-    using ::std::dynamic_pointer_cast;
-    using ::std::static_pointer_cast;
-    template <class T, class U>
-    using function1 = ::std::function<T(U)>;
-#endif
+/* NOTE: Since the version of FCL can be expected to always be > 0.4.0 for EU-Rise, adding optional
+ *       support for boost through the preprocessor only adds complexity for testing.
+ *
+ * #ifdef USE_BOOST_SHARED_PTR
+ *     using ::boost::shared_ptr;
+ *     using ::boost::make_shared;
+ *     using ::boost::dynamic_pointer_cast;
+ *     using ::boost::static_pointer_cast;
+ *     using ::boost::function1;
+ * #else
+ */
+using ::std::shared_ptr;
+using ::std::make_shared;
+using ::std::dynamic_pointer_cast;
+using ::std::static_pointer_cast;
+template <class T, class U>
+using function1 = ::std::function<T(U)>;
+// #endif
 
 typedef std::pair <std::string , shared_ptr<fcl::CollisionObject<double> > > CollisionObjectPair;
 typedef std::multimap <std::string , shared_ptr<fcl::CollisionObject<double>> > CollisionObjectsMap;
