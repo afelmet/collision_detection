@@ -81,7 +81,7 @@ class AbstractCollisionDetection
         virtual bool removeObjectFromOctree(Eigen::Vector3d object_pose, Eigen::Vector3d object_size) = 0;
 
         // The rest of the library expects a 'long unsigned int' instead of an 'int'.
-        virtual long unsigned int numberOfObjectsInCollisionManger() = 0;
+        virtual std::size_t numberOfObjectsInCollisionManager() = 0;
 
 //         virtual bool checkSelfCollision(int num_max_contacts=1) = 0;
 // 

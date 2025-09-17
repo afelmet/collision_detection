@@ -7,7 +7,6 @@
 #include "collision_detection/fcl_wrapper/CollisionObjectAssociatedData.hpp"
 #include "collision_detection/fcl_wrapper/CollisionData.hpp"
 
-
 #include <string>
 #include <vector>
 #include <sys/stat.h> //needed to create director (mkdir function)
@@ -54,8 +53,8 @@ using ::std::shared_ptr;
 using ::std::make_shared;
 using ::std::dynamic_pointer_cast;
 using ::std::static_pointer_cast;
-template <class T, class U>
-using function1 = ::std::function<T(U)>;
+// template <class T, class U>
+// using function1 = ::std::function<T(U)>;
 // #endif
 
 typedef std::pair <std::string , shared_ptr<fcl::CollisionObject<double> > > CollisionObjectPair;
@@ -63,17 +62,17 @@ typedef std::multimap <std::string , shared_ptr<fcl::CollisionObject<double>> > 
 
 class FCLCollisionDetection;
 
-class FCLCollisionDetection: public AbstractCollisionDetection
+class FCLCollisionDetection : public AbstractCollisionDetection
 {
     public:
 
-//         FCLCollisionDetection(OctreeDebugConfig octree_debug_config_, bool use_contact_info=false);
+        // FCLCollisionDetection(OctreeDebugConfig octree_debug_config_, bool use_contact_info=false);
         FCLCollisionDetection(CollisionDetectionConfig collision_detection_config);
         
         virtual ~FCLCollisionDetection();
 
         // The rest of the library expects a 'long unsigned int' instead of an 'int'.
-        long unsigned int numberOfObjectsInCollisionManger();
+        std::size_t numberOfObjectsInCollisionManager();
 
         void getCollisionManager(shared_ptr<fcl::BroadPhaseCollisionManager<double>> &collision_manager);
 
@@ -106,8 +105,9 @@ class FCLCollisionDetection: public AbstractCollisionDetection
         void updateOctomapBoxesEnvironment(const std::shared_ptr<octomap::OcTree> &octomap, const std::string &env_object_name);
         
         bool isCollisionsOccured( double &total_cost);
-            
-        bool checkEnvironmentCollision(const shared_ptr<fcl::BroadPhaseCollisionManager<double>> &external_broad_phase_collision_manager, int num_max_contacts=1);
+
+        // NOTE: Not implemented anywhere.
+        // bool checkEnvironmentCollision(const shared_ptr<fcl::BroadPhaseCollisionManager<double>> &external_broad_phase_collision_manager, int num_max_contacts=1);
 
         bool assignWorldDetector(AbstractCollisionPtr collision_detector);
 
@@ -130,7 +130,7 @@ class FCLCollisionDetection: public AbstractCollisionDetection
                            DistanceData &distance_data);
 
 
-        std::vector< std::pair<std::string, std::string> > getCollidedObjectsNames();
+        std::vector<std::pair<std::string, std::string>> getCollidedObjectsNames();
 
         void printCollisionObject();
 
@@ -140,11 +140,11 @@ class FCLCollisionDetection: public AbstractCollisionDetection
 
         std::vector< DistanceInformation>& getOnlyEnvironmentDistanceInformation();
 
-//         void computeSelfDistanceInfo();
-// 
-//         void computeClosestObstacleToRobotDistanceInfo();
-// 
-//         std::vector<DistanceInformation> &getClosestObstacleToRobotDistanceInfo();
+        // void computeSelfDistanceInfo();
+
+        // void computeClosestObstacleToRobotDistanceInfo();
+
+        // std::vector<DistanceInformation> &getClosestObstacleToRobotDistanceInfo();
         
         void saveOctree();
 
@@ -176,6 +176,9 @@ class FCLCollisionDetection: public AbstractCollisionDetection
         shared_ptr< fcl::CollisionObject<double> > fcl_tree_collision_object_ptr_;
         std::vector<fcl::CollisionObject<double>*> fcl_octomap_boxes_;
 
+        // two new pre-allocated members for self and env distances respectively
+        DistanceData self_distance_data;
+        DistanceData env_distance_data;
 };
 }// end namespace trajectory_optimization
 #endif // COLLISIONDETECTION_HPP

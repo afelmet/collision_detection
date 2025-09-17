@@ -139,3 +139,15 @@ target_link_libraries(test_collision_detection PRIVATE
 )
 
 add_test(NAME CollisionDetectionTest COMMAND test_collision_detection)
+
+add_executable(test_space_qualification test/test_space_qualification.cpp)
+
+target_include_directories(test_space_qualification PRIVATE ${MOTIONPLANNER_LIB_INCLUDES})
+target_include_directories(test_space_qualification SYSTEM PRIVATE ${COLLISION_LIB_THIRD_PARTY_INCLUDES})
+
+target_link_libraries(test_space_qualification PRIVATE
+    ${TARGET_NAME}
+    ${MOTIONPLANNER_DEP_LIBS}
+)
+
+add_test(NAME SpaceQualificationTest COMMAND test_space_qualification)

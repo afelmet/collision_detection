@@ -1,6 +1,8 @@
 #include <base-types/samples/RigidBodyState.hpp>
 #include <collision_detection/CollisionFactory.hpp>
 
+#include <stdlib.h>
+
 using namespace collision_detection;
 
 
@@ -81,11 +83,11 @@ void printDistanceInformation(const collision_detection::AbstractCollisionPtr &c
     distance_info = collision_detector->getCollisionDistanceInformation();
 
     //for(size_t i=0; i<distance_info.size(); i++)
-    for (const DistanceInformation &info : distance_info)
-    {
-        std::cout << "Penetration depth between " << info.object1 << " and " << info.object2 << " is " << info.min_distance << std::endl;
-        std::cout << "contact_normal = \n" << info.contact_normal << std::endl;
-    }
+    // for (const DistanceInformation &info : distance_info)
+    // {
+    //     //std::cout << "Penetration depth between " << info.object1 << " and " << info.object2 << " is " << info.min_distance << std::endl;
+    //     //std::cout << "contact_normal = \n" << info.contact_normal << std::endl;
+    // }
 }
 
 std::shared_ptr<octomap::OcTree> generateOctomap()
@@ -169,15 +171,15 @@ void checkForCollision(const collision_detection::AbstractCollisionPtr &robot_co
     double collision_cost = 0.0;
     if(robot_collision_detector->isCollisionsOccured(collision_cost))
     {
-        std::cout<<"Collision Occured between: \n";
+        //std::cout<<"Collision Occured between: \n";
         std::vector< std::pair<std::string, std::string> > collision_objects_name = robot_collision_detector->getCollidedObjectsNames();
 
         // for(size_t i = 0; i < collision_objects_name.size(); i++)
-        for (const std::pair<std::string, std::string> &name : collision_objects_name)
-            std::cout << name.first << "  " << name.second << std::endl;
+        // for (const std::pair<std::string, std::string> &name : collision_objects_name)
+            //std::cout << name.first << "  " << name.second << std::endl;
     }
-    else
-        std::cout<<"There is no collision"<<std::endl;
+    // else
+        //std::cout<<"There is no collision"<<std::endl;
 }
 
 int main()
@@ -190,20 +192,20 @@ int main()
     robot_collision_detector->assignWorldDetector(world_collision_detector);
     // // create two robot object and an environment object
     // createCollisionObjects(robot_collision_detector, world_collision_detector);
-    // std::cout<<"\n";
+    // //std::cout<<"\n";
     // // Print collision object
-    // std::cout<<"---------------- Robot Collision Objects----------------"<<std::endl;
+    // //std::cout<<"---------------- Robot Collision Objects----------------"<<std::endl;
     // robot_collision_detector->printCollisionObject();
-    // std::cout<<"---------------- World Collision Objects----------------"<<std::endl;
+    // //std::cout<<"---------------- World Collision Objects----------------"<<std::endl;
     // world_collision_detector->printCollisionObject();
-    // std::cout<<"\n";
+    // //std::cout<<"\n";
     
-    // std::cout<<"CASE 1: Now we check collision for the initial state"<<std::endl;
+    // //std::cout<<"CASE 1: Now we check collision for the initial state"<<std::endl;
     // // Now we check collision for the initial state
     // checkForCollision(robot_collision_detector);
     // printDistanceInformation(robot_collision_detector);
      
-    // std::cout<<"\nCASE 2: Now we check collision after moving the sphere2"<<std::endl;
+    // //std::cout<<"\nCASE 2: Now we check collision after moving the sphere2"<<std::endl;
     // //Now we move the sphere2 towards sphere1
     // base::Pose new_pose;
     // new_pose.position = Eigen::Vector3d(0.05, 0.0, 0.0);
@@ -213,7 +215,7 @@ int main()
     // checkForCollision(robot_collision_detector);
     // printDistanceInformation(robot_collision_detector);
     
-    // std::cout<<"\nCASE 3: Now we check collision with environment"<<std::endl;
+    // //std::cout<<"\nCASE 3: Now we check collision with environment"<<std::endl;
     // new_pose.position = Eigen::Vector3d(0.0, -2.5, 0.0);
     // robot_collision_detector->updateCollisionObjectTransform("sphere1", new_pose);
     // new_pose.position = Eigen::Vector3d(0.0, 2.5, 0.0);
@@ -225,32 +227,36 @@ int main()
 
 
     createCollisionObjectsBox(robot_collision_detector);
+
+    // INITIALIZATION SHOULD BE OVER HERE -> NO MORE MEMORY ALLOCATIONS
+
     checkForCollision(robot_collision_detector);
-    std::cout<<"\n";
+
+    // //std::cout<<"\n";
     // Print collision object
-    std::cout<<"---------------- Robot Collision Objects----------------"<<std::endl;
+    // //std::cout<<"---------------- Robot Collision Objects----------------"<<std::endl;
     robot_collision_detector->printCollisionObject();
-    std::cout<<"---------------- World Collision Objects----------------"<<std::endl;
+    // //std::cout<<"---------------- World Collision Objects----------------"<<std::endl;
     world_collision_detector->printCollisionObject();
-    std::cout<<"\n";
+    // //std::cout<<"\n";
 
  
-    base::Pose object_1_pose;
-    object_1_pose.position.x() = -0.598477;
-    object_1_pose.position.y() =  0.00785362;
-    object_1_pose.position.z() = 0.991159;
-    object_1_pose.orientation = Eigen::Quaterniond::Identity();
-    base::Pose object_2_pose;
-    object_2_pose.position.x() = -0.580182;
-    object_2_pose.position.y() =  0.00555984;
-    object_2_pose.position.z() = 0.96868;
-    object_2_pose.orientation = Eigen::Quaterniond::Identity();
+    // base::Pose object_1_pose;
+    // object_1_pose.position.x() = -0.598477;
+    // object_1_pose.position.y() =  0.00785362;
+    // object_1_pose.position.z() = 0.991159;
+    // object_1_pose.orientation = Eigen::Quaterniond::Identity();
+    // base::Pose object_2_pose;
+    // object_2_pose.position.x() = -0.580182;
+    // object_2_pose.position.y() =  0.00555984;
+    // object_2_pose.position.z() = 0.96868;
+    // object_2_pose.orientation = Eigen::Quaterniond::Identity();
 
-    robot_collision_detector->updateCollisionObjectTransform("cylinder1", object_1_pose);
-    robot_collision_detector->updateCollisionObjectTransform("cylinder2", object_2_pose);
-    // Now we check collision for this state
-    checkForCollision(robot_collision_detector);
-    printDistanceInformation(robot_collision_detector);
+    // robot_collision_detector->updateCollisionObjectTransform("cylinder1", object_1_pose);
+    // robot_collision_detector->updateCollisionObjectTransform("cylinder2", object_2_pose);
+    // // Now we check collision for this state
+    // checkForCollision(robot_collision_detector);
+    // printDistanceInformation(robot_collision_detector);
     
     return 0;
 }
