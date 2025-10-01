@@ -3,19 +3,10 @@
 namespace collision_detection
 {
 
-CollisionObjectAssociatedData::CollisionObjectAssociatedData()
-{
-}
+CollisionObjectAssociatedData::CollisionObjectAssociatedData() {}
 
+[[nodiscard]] std::string &CollisionObjectAssociatedData::getID() { return this->id; }
 
-[[nodiscard]] std::string& CollisionObjectAssociatedData::getID()
-{
-    return this->id;
-}
+void CollisionObjectAssociatedData::setID(const std::string &id_param) { this->id = id_param; }
 
-void CollisionObjectAssociatedData::setID(const std::string &id_param)
-{
-    this->id=id_param;
-}
-
-}// end namespace trajectory_optimization
+} // namespace collision_detection

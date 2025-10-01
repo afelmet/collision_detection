@@ -36,6 +36,23 @@ else()
     message(WARNING "FCL not found")
 endif()
 
+find_program(CLANG_FORMAT_EXECUTABLE NAMES clang-format)
+if(CLANG_FORMAT_EXECUTABLE)
+    file(GLOB_RECURSE CPP_FILES "${CMAKE_SOURCE_DIR}/src/*.cpp")
+    file(GLOB_RECURSE HPP_FILES "${CMAKE_SOURCE_DIR}/include/collision_detection/*.hpp")
+
+    # Combine the lists of files
+    set(FORMAT_FILES ${CPP_FILES} ${HPP_FILES})
+
+    add_custom_target(format
+      COMMAND ${CLANG_FORMAT_EXECUTABLE} -i ${FORMAT_FILES}
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+      COMMENT "Running clang-format ..."
+    )
+else()
+    message(WARNING "clang-format not found. Formatting target will not be available.")
+endif()
+
 # Define the abstract_collision_detection library
 add_library(abstract_collision_detection SHARED
     src/abstract/AbstractCollisionDetection.cpp

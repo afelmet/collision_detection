@@ -9,16 +9,15 @@ namespace collision_detection
 
 class CollisionObjectAssociatedData
 {
-private:
+  private:
     std::string id;
-public:
+
+  public:
     CollisionObjectAssociatedData();
-    std::string& getID();
+    std::string &getID();
 
     void setID(const std::string &id_param);
-
 };
 
-}// end namespace collision_detection
+} // end namespace collision_detection
 #endif // COLLISIONOBJECTASSOCIATEDDATA_HPP
-
