@@ -7,7 +7,7 @@ using namespace collision_detection;
 
 
 
-collision_detection::AbstractCollisionPtr createCollisionManager(collision_detection::CollisionFactory &collision_factory)
+collision_detection::CollisionPtr createCollisionManager(collision_detection::CollisionFactory &collision_factory)
 {
     collision_detection::CollisionDetectionConfig coll_config;
     coll_config.collision_library = collision_detection::FCL;
@@ -19,7 +19,7 @@ collision_detection::AbstractCollisionPtr createCollisionManager(collision_detec
     return collision_factory.getCollisionDetector(coll_config);
 }
 
-void createCollisionObjects(collision_detection::AbstractCollisionPtr &collision_detector)
+void createCollisionObjects(std::shared_ptr<BaseCollisionDetection<FCLCollisionDetection>> &collision_detector)
 {
     // sphere 1
     double radius_1 = 0.2;
@@ -36,7 +36,7 @@ void createCollisionObjects(collision_detection::AbstractCollisionPtr &collision
     collision_detector->registerSphereToCollisionManager(radius_2, object_2_name, object_2_pose, 1.0);
 }
 
-void createCollisionObjectsBox(collision_detection::AbstractCollisionPtr &collision_detector)
+void createCollisionObjectsBox(std::shared_ptr<BaseCollisionDetection<FCLCollisionDetection>> &collision_detector)
 {
     // box 1
     double box_x1 = 0.2;
@@ -76,7 +76,7 @@ void createCollisionObjectsBox(collision_detection::AbstractCollisionPtr &collis
     //collision_detector->registerCylinderToCollisionManager(radius, length, object_2_name, object_2_pose, 1.0);
 }
 
-void printDistanceInformation(const collision_detection::AbstractCollisionPtr &collision_detector)
+void printDistanceInformation(const std::shared_ptr<BaseCollisionDetection<FCLCollisionDetection>> &collision_detector)
 {
     std::vector<collision_detection::DistanceInformation> distance_info;
     //cs.robot_model_->getRobotDistanceToCollisionInfo(distance_info);
@@ -132,8 +132,8 @@ std::shared_ptr<octomap::OcTree> generateOctomap()
     return tree;
 }                            
 
-void createCollisionObjects(collision_detection::AbstractCollisionPtr &robot_collision_detector, 
-                            collision_detection::AbstractCollisionPtr &world_collision_detector)
+void createCollisionObjects(std::shared_ptr<BaseCollisionDetection<FCLCollisionDetection>> &robot_collision_detector, 
+                            std::shared_ptr<BaseCollisionDetection<FCLCollisionDetection>> &world_collision_detector)
 {
     // sphere 1
     double radius_1 = 0.1;
@@ -166,7 +166,7 @@ void createCollisionObjects(collision_detection::AbstractCollisionPtr &robot_col
 
 }
   
-void checkForCollision(const collision_detection::AbstractCollisionPtr &robot_collision_detector)
+void checkForCollision(const std::shared_ptr<BaseCollisionDetection<FCLCollisionDetection>> &robot_collision_detector)
 {
     double collision_cost = 0.0;
     if(robot_collision_detector->isCollisionsOccured(collision_cost))
@@ -186,8 +186,8 @@ int main()
 {
     // create the collision factor and assign fcl based robot and world collision detectors
     collision_detection::CollisionFactory collision_factory;
-    collision_detection::AbstractCollisionPtr robot_collision_detector = createCollisionManager(collision_factory);
-    collision_detection::AbstractCollisionPtr world_collision_detector = createCollisionManager(collision_factory);
+    collision_detection::CollisionPtr robot_collision_detector = createCollisionManager(collision_factory);
+    collision_detection::CollisionPtr world_collision_detector = createCollisionManager(collision_factory);
     // assign the world collision detector to the robot collision detector
     robot_collision_detector->assignWorldDetector(world_collision_detector);
     // // create two robot object and an environment object

@@ -2,41 +2,25 @@
 #define COLLISIONFACTORY_HPP_
 
 #include <string>
+#include <variant>
 #include <vector>
 
+#include "collision_detection/BaseCollisionDetection.hpp"
 #include "collision_detection/CollisionConfig.hpp"
-#include "collision_detection/abstract/AbstractCollisionDetection.hpp"
 #include "fcl_wrapper/FCLCollisionDetection.hpp"
-
-/** \file CollisionDetection.hpp
- *    \brief Factory class for the AbstractCollisionDetection class.
- */
 
 namespace collision_detection
 {
+typedef std::variant<std::monostate, std::shared_ptr<FCLCollisionDetection>> CollisionPtr;
 
-/**
- * @class CollisionDetector
- * @brief Provides a factory class for the AbstractCollisionDetection class.
- */
 class CollisionFactory
 {
   public:
-    /**
-     * @brief  constructor
-     */
     CollisionFactory();
-    /**
-     * @brief  destructor
-     */
     ~CollisionFactory();
 
-    //      AbstractCollisionPtr
-    //      getCollisionDetector(collision_detection::CollisionLibrary library,
-    //      OctreeDebugConfig octree_debug_config, bool use_contact_info=false);
-    AbstractCollisionPtr getCollisionDetector(CollisionDetectionConfig collision_detection_config);
+    CollisionPtr getCollisionDetector(CollisionDetectionConfig collision_detection_config);
 };
-
 }; // namespace collision_detection
 
 #endif
