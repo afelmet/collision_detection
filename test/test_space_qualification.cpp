@@ -90,13 +90,18 @@ int main()
                 if (detector->isCollisionsOccured(collision_cost))
                 {
                     auto collision_objects_name = detector->getCollidedObjectsNames();
-                    for (const std::pair<std::string, std::string> &name : collision_objects_name)
-                        std::cout << "[\033[0;32m SUCCESS\033[0m ] Expected collision between "
-                                  << name.first << " and " << name.second << " detected."
+                    if (collision_objects_name.size() == 0) {
+                        std::cout << "[\033[0;31m FAILURE\033[0m ] Collision detected, but no objects returned."
                                   << std::endl;
+                    } else {
+                        for (const std::pair<std::string, std::string> &name : collision_objects_name)
+                            std::cout << "[\033[0;32m SUCCESS\033[0m ] Expected collision between "
+                                      << name.first << " and " << name.second << " detected."
+                                      << std::endl;
 
-                    std::cout << "[\033[0;32m SUCCESS\033[0m ] " << collision_objects_name.size()
-                              << std::endl;
+                        std::cout << "[\033[0;32m SUCCESS\033[0m ] " << collision_objects_name.size()
+                                  << std::endl;
+                    }
                 }
                 else
                 {
@@ -130,10 +135,15 @@ int main()
                 if (detector->isCollisionsOccured(collision_cost))
                 {
                     auto collision_objects_name = detector->getCollidedObjectsNames();
-                    for (const std::pair<std::string, std::string> &name : collision_objects_name)
-                        std::cout << "[\033[0;32m SUCCESS\033[0m ] Expected collision between "
-                                  << name.first << " and " << name.second << " detected."
+                    if (collision_objects_name.size() == 0) {
+                        std::cout << "[\033[0;31m FAILURE\033[0m ] Collision detected, but no objects returned."
                                   << std::endl;
+                    } else {
+                        for (const std::pair<std::string, std::string> &name : collision_objects_name)
+                            std::cout << "[\033[0;32m SUCCESS\033[0m ] Expected collision between "
+                                      << name.first << " and " << name.second << " detected."
+                                      << std::endl;
+                    }
                 }
                 else
                 {

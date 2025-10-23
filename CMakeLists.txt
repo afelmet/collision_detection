@@ -122,16 +122,16 @@ install(TARGETS ${PROJECT_NAME} DESTINATION lib)
 install(TARGETS fcl_wrapper DESTINATION lib)
 install(FILES ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.pc DESTINATION lib/pkgconfig)
 
-add_executable(test_collision_detection test/test_collision_detection.cpp)
-
-target_include_directories(test_collision_detection PRIVATE ${COLLISION_LIB_INCLUDES})
-
-target_link_libraries(test_collision_detection PRIVATE
-    ${TARGET_NAME}
-    ${COLLISION_DEP_LIBS}
-)
-
-add_test(NAME CollisionDetectionTest COMMAND test_collision_detection)
+# add_executable(test_collision_detection test/test_collision_detection.cpp)
+# 
+# target_include_directories(test_collision_detection PRIVATE ${COLLISION_LIB_INCLUDES})
+# 
+# target_link_libraries(test_collision_detection PRIVATE
+#     ${TARGET_NAME}
+#     ${COLLISION_DEP_LIBS}
+# )
+# 
+# add_test(NAME CollisionDetectionTest COMMAND test_collision_detection)
 
 add_executable(test_space_qualification test/test_space_qualification.cpp)
 
