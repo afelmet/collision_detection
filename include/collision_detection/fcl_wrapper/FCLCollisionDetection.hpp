@@ -159,17 +159,18 @@ class FCLCollisionDetection : public BaseCollisionDetection<FCLCollisionDetectio
 
     void saveOctree();
 
-    std::vector<std::pair<std::string, std::string>> getCollidedObjectsNames();
+    std::ranges::subrange<std::vector<std::pair<std::string, std::string>>::iterator>
+    getCollidedObjectsNames();
 
-    std::vector<std::string> getRobotCollisionObjectsNames();
+    auto getRobotCollisionObjectsNames();
 
-    std::vector<std::string> getWorldCollisionObjectsNames();
+    auto getWorldCollisionObjectsNames();
 
-    std::vector<DistanceInformation> &getCollisionDistanceInformation();
+    auto getCollisionDistanceInformation();
 
-    std::vector<DistanceInformation> &getCompleteDistanceInformation();
+    auto getCompleteDistanceInformation();
 
-    std::vector<DistanceInformation> &getOnlyEnvironmentDistanceInformation();
+    auto getOnlyEnvironmentDistanceInformation();
 };
 } // namespace collision_detection
 

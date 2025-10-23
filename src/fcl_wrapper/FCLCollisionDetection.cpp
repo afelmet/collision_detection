@@ -1442,24 +1442,21 @@ FCLCollisionDetection::getCollisionCost(CollisionData &collision_data,
     return collision_cost;
 }
 
-[[nodiscard]] std::vector<DistanceInformation> &
-FCLCollisionDetection::getCollisionDistanceInformation()
+[[nodiscard]] auto FCLCollisionDetection::getCollisionDistanceInformation()
 {
-    return full_collision_distance_information_;
+    return std::ranges::views::all(full_collision_distance_information_);
 }
 
-[[nodiscard]] std::vector<DistanceInformation> &
-FCLCollisionDetection::getCompleteDistanceInformation()
+[[nodiscard]] auto FCLCollisionDetection::getCompleteDistanceInformation()
 {
     calculateCompleteDistanceInfo();
-    return full_collision_distance_information_;
+    return std::ranges::views::all(full_collision_distance_information_);
 }
 
-[[nodiscard]] std::vector<DistanceInformation> &
-FCLCollisionDetection::getOnlyEnvironmentDistanceInformation()
+[[nodiscard]] auto FCLCollisionDetection::getOnlyEnvironmentDistanceInformation()
 {
     calculateOnlyEnvironmentDistanceInfo();
-    return full_collision_distance_information_;
+    return std::ranges::views::all(full_collision_distance_information_);
 }
 
 void FCLCollisionDetection::printCollisionObject()
@@ -1492,41 +1489,34 @@ void FCLCollisionDetection::printCollisionObject()
 /*
  * NOTE: Results in dynamic memory allcations everytime it is called.
  */
-[[nodiscard]] std::vector<std::string> FCLCollisionDetection::getRobotCollisionObjectsNames()
+[[nodiscard]] auto FCLCollisionDetection::getRobotCollisionObjectsNames()
 {
-    std::vector<std::string> collision_object_names;
-
-    for (CollisionObjectsMap::iterator it = collision_objects_container_.begin();
-         it != collision_objects_container_.end(); ++it)
-        collision_object_names.push_back(it->first);
-
-    return collision_object_names;
+    return std::ranges::views::keys(collision_objects_container_);
 }
 
-[[nodiscard]] std::vector<std::string> FCLCollisionDetection::getWorldCollisionObjectsNames()
+[[nodiscard]] auto FCLCollisionDetection::getWorldCollisionObjectsNames()
 {
-    std::vector<std::string> collision_object_names;
-
-    for (CollisionObjectsMap::iterator it =
-             world_collision_detector_->cast()->collision_objects_container_.begin();
-         it != world_collision_detector_->cast()->collision_objects_container_.end(); ++it)
-        collision_object_names.push_back(it->first);
-
-    return collision_object_names;
+    return std::ranges::views::keys(collision_objects_container_);
 }
 
-[[nodiscard]] std::vector<std::pair<std::string, std::string>>
+/*
+ * NOTE: The return type would need to be known at compile time, which causes issues when using
+ * 'auto', due to the runtime dependence on the configuration.
+ */
+[[nodiscard]] std::ranges::subrange<std::vector<std::pair<std::string, std::string>>::iterator>
 FCLCollisionDetection::getCollidedObjectsNames()
 {
     switch (collision_detection_config_.collision_info_type)
     {
     case collision_detection::DISTANCE:
     {
-        return this->self_distance_data.collision_info.collision_object_names;
+        return std::ranges::views::all(
+            this->self_distance_data.collision_info.collision_object_names);
     }
     case collision_detection::MULTI_CONTACT:
     {
-        return this->env_distance_data.collision_info.collision_object_names;
+        return std::ranges::views::all(
+            this->env_distance_data.collision_info.collision_object_names);
     }
     default:
     {

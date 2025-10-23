@@ -36,8 +36,9 @@ find_program(CLANG_FORMAT_EXECUTABLE NAMES clang-format)
 if(CLANG_FORMAT_EXECUTABLE)
     file(GLOB_RECURSE CPP_FILES "${CMAKE_SOURCE_DIR}/src/*.cpp")
     file(GLOB_RECURSE HPP_FILES "${CMAKE_SOURCE_DIR}/include/collision_detection/*.hpp")
+    file(GLOB_RECURSE TEST_FILES "${CMAKE_SOURCE_DIR}/test/*.cpp")
 
-    set(FORMAT_FILES ${CPP_FILES} ${HPP_FILES})
+    set(FORMAT_FILES ${CPP_FILES} ${HPP_FILES} ${TEST_FILES})
 
     add_custom_target(format
       COMMAND ${CLANG_FORMAT_EXECUTABLE} -i ${FORMAT_FILES}
@@ -48,17 +49,17 @@ else()
     message(WARNING "clang-format not found. Formatting target will not be available.")
 endif()
 
-set(COLLISION_LIB_INCLUDES 
+set(COLLISION_LIB_INCLUDES
     ${CMAKE_SOURCE_DIR}/include
     ${EIGEN3_INCLUDE_DIR}
     ${ASSIMP_INCLUDE_DIRS}
     ${KDL_PARSER_INCLUDE_DIRS}
-    ${URDF_INCLUDE_DIRS} 
-    ${URDFHEADER_INCLUDE_DIRS} 
-    ${SRDFDOM_INCLUDE_DIRS} 
-    ${OCTOMAP_INCLUDE_DIRS} 
+    ${URDF_INCLUDE_DIRS}
+    ${URDFHEADER_INCLUDE_DIRS}
+    ${SRDFDOM_INCLUDE_DIRS}
+    ${OCTOMAP_INCLUDE_DIRS}
     ${FCL_INCLUDE_DIRS}
-    ${BASE_TYPES_INCLUDE_DIRS} 
+    ${BASE_TYPES_INCLUDE_DIRS}
     ${BASE_LOGGING_INCLUDE_DIRS}
     ${CCD_INCLUDE_DIRS}
 )
@@ -67,13 +68,13 @@ set(COLLISION_DEP_LIBS
     Threads::Threads
     Eigen3::Eigen
     ${ASSIMP_LIBRARIES}
-    ${Boost_SYSTEM_LIBRARY} 
-    ${Boost_FILESYSTEM_LIBRARY} 
-    ${KDL_PARSER_LIBRARIES} 
-    ${URDF_LIBRARIES} 
+    ${Boost_SYSTEM_LIBRARY}
+    ${Boost_FILESYSTEM_LIBRARY}
+    ${KDL_PARSER_LIBRARIES}
+    ${URDF_LIBRARIES}
     ${URDFHEADER_LIBRARIES}
-    ${SRDFDOM_LIBRARIES} 
-    ${OCTOMAP_LIBRARIES} 
+    ${SRDFDOM_LIBRARIES}
+    ${OCTOMAP_LIBRARIES}
     ${FCL_LIBRARIES}
     ${BASE_TYPES_LIBRARIES}
     ${BASE_LOGGING_LIBRARIES}
@@ -82,7 +83,6 @@ set(COLLISION_DEP_LIBS
 
 if(FCL_FOUND)
     add_library(fcl_wrapper SHARED
-      # src/BaseCollisionDetection.cpp
         src/fcl_wrapper/FCLCollisionDetection.cpp
         src/fcl_wrapper/CollisionObjectAssociatedData.cpp
     )
@@ -122,16 +122,16 @@ install(TARGETS ${PROJECT_NAME} DESTINATION lib)
 install(TARGETS fcl_wrapper DESTINATION lib)
 install(FILES ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.pc DESTINATION lib/pkgconfig)
 
-# add_executable(test_collision_detection test/test_collision_detection.cpp)
-# 
-# target_include_directories(test_collision_detection PRIVATE ${COLLISION_LIB_INCLUDES})
-# 
-# target_link_libraries(test_collision_detection PRIVATE
-#     ${TARGET_NAME}
-#     ${COLLISION_DEP_LIBS}
-# )
-# 
-# add_test(NAME CollisionDetectionTest COMMAND test_collision_detection)
+add_executable(test_collision_detection test/test_collision_detection.cpp)
+
+target_include_directories(test_collision_detection PRIVATE ${COLLISION_LIB_INCLUDES})
+
+target_link_libraries(test_collision_detection PRIVATE
+    ${TARGET_NAME}
+    ${COLLISION_DEP_LIBS}
+)
+
+add_test(NAME CollisionDetectionTest COMMAND test_collision_detection)
 
 add_executable(test_space_qualification test/test_space_qualification.cpp)
 
